@@ -1,13 +1,32 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import router from './router'
 import './style.css'
+import './styles/variables.css'
 import App from './App.vue'
 import env from './utils/env'
+import { useUserStore } from './stores/user'
 
-if (env.isDebug) {
-  console.log('? Ó¦ÓÃÆô¶¯£¬µ±Ç°»·¾³:', env.isDev ? '¿ª·¢»·¾³' : 'Éú²ú»·¾³')
-  console.log('? Ó¦ÓÃÃû³Æ:', env.title)
-  console.log('? APIµØÖ·:', env.apiBaseUrl)
+if (env.debug.enabled) {
+  console.log('åº”ç”¨å¯åŠ¨ï¼Œå½“å‰ç¯å¢ƒ:', env.isDev ? 'å¼€å‘ç¯å¢ƒ' : 'ç”Ÿäº§ç¯å¢ƒ')
+  console.log('åº”ç”¨åç§°:', env.app.title)
+  console.log('APIåœ°å€:', env.api.baseUrl)
 }
 
 const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.use(router)
+
+router.isReady().then(() => {
+  const userStore = useUserStore()
+  userStore.initFromStorage()
+})
+
 app.mount('#app')
+
+if (env.debug.enabled) {
+  console.log('Vueåº”ç”¨æŒ‚è½½æˆåŠŸ')
+}
+

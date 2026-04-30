@@ -2,7 +2,7 @@ spring:
   application:
     name: med-manager-backend
   profiles:
-    active: dev-local
+    active: prod-local
 
 server:
   port: 8080

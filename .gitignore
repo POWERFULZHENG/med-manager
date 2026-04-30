@@ -62,6 +62,12 @@ application-prod-local.yaml
 application-test-local.yml
 application-test-local.yaml
 
+# Upload files
+/upload/*
+!/upload/.gitkeep
+backend/med-manager-backend/upload/*
+!backend/med-manager-backend/upload/.gitkeep
+
 # Temporary files
 *.tmp
 *.temp

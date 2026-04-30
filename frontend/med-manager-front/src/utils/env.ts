@@ -9,7 +9,7 @@ const parseNumber = (value: string | undefined, defaultValue: number): number =>
 
 export const env = {
   app: {
-    title: import.meta.env.VITE_APP_TITLE || '家庭常用药管理系统',
+    title: import.meta.env.VITE_APP_TITLE || '瀹跺涵鑽搧绠＄悊绯荤粺',
     version: import.meta.env.VITE_APP_VERSION || '1.0.0',
     defaultPageSize: parseNumber(import.meta.env.VITE_APP_DEFAULT_PAGE_SIZE, 10),
     maxPageSize: parseNumber(import.meta.env.VITE_APP_MAX_PAGE_SIZE, 100),
@@ -39,3 +39,4 @@ export const env = {
 }
 
 export default env
+
