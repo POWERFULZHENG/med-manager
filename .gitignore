@@ -1,0 +1,68 @@
+# Maven
+.mvn/
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node
+node_modules/
+dist/
+.npm
+.eslintcache
+.stylelintcache
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Spring Boot sensitive configs
+application-local.yml
+application-local.yaml
+application-*-local.yml
+application-*-local.yaml
+application-dev-local.yml
+application-dev-local.yaml
+application-prod-local.yml
+application-prod-local.yaml
+application-test-local.yml
+application-test-local.yaml
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

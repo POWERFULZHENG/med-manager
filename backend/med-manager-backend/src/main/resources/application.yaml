@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: med-manager-backend
+  profiles:
+    active: dev-local
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api

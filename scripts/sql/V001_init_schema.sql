@@ -2,6 +2,16 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- =========================
+-- 彻底删除所有表（清空残留数据）
+-- =========================
+DROP TABLE IF EXISTS inventory_record;
+DROP TABLE IF EXISTS medicine_stock;
+DROP TABLE IF EXISTS medicine;
+DROP TABLE IF EXISTS ocr_record;
+DROP TABLE IF EXISTS sys_user;
+DROP TABLE IF EXISTS sys_role;
+
+-- =========================
 -- 1. 角色表
 -- =========================
 DROP TABLE IF EXISTS sys_role;
@@ -134,13 +144,3 @@ CREATE TABLE ocr_record (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OCR识别记录表';
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-INSERT INTO sys_role (role_code, role_name, remark)
-VALUES
-('ADMIN', '管理员', '系统管理员'),
-('USER', '普通用户', '家庭成员普通用户');
-
--- 注意：password 字段这里必须放加密后的密码哈希，不要存明文
-INSERT INTO sys_user (username, password, nickname, phone, role_id, status)
-VALUES
-('admin', '$2a$10$replace_with_bcrypt_hash', '管理员', '13800000000', 1, 1);
