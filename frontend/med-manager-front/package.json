@@ -7,15 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "git:start": "powershell ../scripts/git-flow.ps1 start",
-    "git:feature": "powershell ../scripts/git-flow.ps1 feature",
-    "git:hotfix": "powershell ../scripts/git-flow.ps1 hotfix",
-    "git:release": "powershell ../scripts/git-flow.ps1 release",
-    "git:commit": "powershell ../scripts/git-flow.ps1 commit",
-    "git:finish": "powershell ../scripts/git-flow.ps1 finish",
-    "git:sync": "powershell ../scripts/git-flow.ps1 sync",
-    "git:status": "powershell ../scripts/git-flow.ps1 status",
-    "git:branches": "powershell ../scripts/git-flow.ps1 branches"
+    "git:help": "echo '??  请在项目根目录执行 git 管理脚本: cd .. && npm run git:help'"
   },
   "dependencies": {
     "axios": "^1.7.9",

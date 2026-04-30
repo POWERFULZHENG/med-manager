@@ -1,0 +1,17 @@
+{
+  "name": "med-manager",
+  "version": "1.0.0",
+  "description": "家庭常用药管理系统",
+  "scripts": {
+    "git:start": "powershell -Command \"& .\\scripts\\git-flow.ps1 start\"",
+    "git:feature": "powershell -Command \"& .\\scripts\\git-flow.ps1 feature\"",
+    "git:hotfix": "powershell -Command \"& .\\scripts\\git-flow.ps1 hotfix\"",
+    "git:release": "powershell -Command \"& .\\scripts\\git-flow.ps1 release\"",
+    "git:commit": "powershell -Command \"& .\\scripts\\git-flow.ps1 commit\"",
+    "git:finish": "powershell -Command \"& .\\scripts\\git-flow.ps1 finish\"",
+    "git:sync": "powershell -Command \"& .\\scripts\\git-flow.ps1 sync\"",
+    "git:status": "powershell -Command \"& .\\scripts\\git-flow.ps1 status\"",
+    "git:branches": "powershell -Command \"& .\\scripts\\git-flow.ps1 branches\"",
+    "git:help": "powershell -Command \"& .\\scripts\\git-flow.ps1 help\""
+  }
+}
