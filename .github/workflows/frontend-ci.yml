@@ -6,25 +6,25 @@ on:
   pull_request:
     branches: [ develop, main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: 'frontend/med-manager-front/package-lock.json'
       
       - name: Install dependencies
         run: cd frontend/med-manager-front && npm install
-      
-      - name: Type check
-        run: cd frontend/med-manager-front && npm run type-check 2>/dev/null || true
       
       - name: Build
         run: cd frontend/med-manager-front && npm run build

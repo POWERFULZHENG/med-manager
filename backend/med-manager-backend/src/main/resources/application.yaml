@@ -2,35 +2,7 @@ spring:
   application:
     name: med-manager-backend
   profiles:
-    active: prod-local
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/med_manager?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: med_user
-    password: MedManager@2024
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password:
-      database: 0
-      timeout: 3000ms
-
-  mail:
-    host: smtp.qq.com
-    port: 587
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
+    active: dev
   servlet:
     multipart:
       enabled: true
@@ -45,7 +17,6 @@ server:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
@@ -69,8 +40,6 @@ management:
 ocr:
   enabled: ${OCR_ENABLED:true}
   baidu:
-    api-key: ${OCR_BAIDU_API_KEY:}
-    secret-key: ${OCR_BAIDU_SECRET_KEY:}
     url: https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic
     token-url: https://aip.baidubce.com/oauth/2.0/token
 
@@ -84,13 +53,5 @@ file:
 
 logging:
   config: classpath:logback-spring.xml
-  level:
-    root: INFO
-    com.xzzj.medmanager: INFO
-    com.xzzj.medmanager.mapper: DEBUG
   file:
     path: ./logs
-
-jwt:
-  secret: ${JWT_SECRET:your-super-secret-jwt-key-at-least-256-bits-long-please-change-this}
-  expiration: 86400000

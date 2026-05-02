@@ -124,7 +124,7 @@ const pagination = reactive({
 })
 
 const formData = reactive({
-  id: null as number | null,
+  id: 0,
   name: '',
   spec: '',
   category: '',
@@ -221,8 +221,8 @@ const handleSubmit = async () => {
         ElMessage.success('编辑成功')
       } else {
         tableData.value.push({
-          id: Date.now(),
           ...formData,
+          id: Date.now(),
           stock: 0,
           expireDays: 365
         })

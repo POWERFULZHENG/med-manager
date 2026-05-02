@@ -75,7 +75,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach((to, _from) => {
   document.title = `${to.meta.title || '家庭常用药管理系统'}`
   
   const token = localStorage.getItem('med_manager_token')

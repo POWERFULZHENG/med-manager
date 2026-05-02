@@ -1,31 +1,52 @@
 spring:
+  config:
+    activate:
+      on-profile: prod
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=true&serverTimezone=Asia/Shanghai
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: 0
+      timeout: 3000ms
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.xzzj.medmanager.entity
   configuration:
-    map-underscore-to-camel-case: true
-  global-config:
-    db-config:
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:3600000}
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 
 logging:
   level:
-    com.xzzj.medmanager: info
-    org.springframework.web: warn
-    root: warn
-  file:
-    name: logs/med-manager.log
-    max-size: 100MB
-    max-history: 30
+    com.xzzj.medmanager: INFO
+    org.springframework.web: WARN
+    root: WARN
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
+
+ocr:
+  baidu:
+    api-key: ${OCR_BAIDU_API_KEY}
+    secret-key: ${OCR_BAIDU_SECRET_KEY}

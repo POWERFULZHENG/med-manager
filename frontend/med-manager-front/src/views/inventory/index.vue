@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-card>
     <template #header>
       <div class="card-header">
@@ -80,13 +80,12 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import MedStatusTag from '../../components/MedStatusTag.vue'
 
 const loading = ref(false)
 const submitLoading = ref(false)
 const dialogVisible = ref(false)
-const formRef = ref<FormInstance>()
 const operationType = ref<'in' | 'out'>('in')
 const currentMedicine = ref('')
 const currentUnit = ref('盒')
