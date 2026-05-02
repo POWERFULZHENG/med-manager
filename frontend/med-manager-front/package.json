@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "git:help": "echo '??  请在项目根目录执行 git 管理脚本: cd .. && npm run git:help'"
   },
   "dependencies": {
@@ -19,11 +22,14 @@
   "devDependencies": {
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.9.1",
+    "jsdom": "^26.0.0",
     "typescript": "~6.0.2",
     "unplugin-auto-import": "^21.0.0",
     "unplugin-vue-components": "^32.0.0",
     "vite": "^8.0.10",
+    "vitest": "^3.0.0",
     "vue-tsc": "^3.2.7"
   }
 }
