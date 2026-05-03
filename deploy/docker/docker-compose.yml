@@ -11,7 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./scripts/sql:/docker-entrypoint-initdb.d
+      - ../../scripts/sql:/docker-entrypoint-initdb.d
     networks:
       - med-manager-network
     healthcheck:
@@ -35,7 +35,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ../..
       dockerfile: deploy/docker/backend.Dockerfile
     container_name: med-manager-backend
     environment:
@@ -58,12 +58,12 @@ services:
     networks:
       - med-manager-network
     volumes:
-      - ./upload:/app/upload
-      - ./logs:/app/logs
+      - ../../upload:/app/upload
+      - ../../logs:/app/logs
 
   frontend:
     build:
-      context: .
+      context: ../..
       dockerfile: deploy/docker/frontend.Dockerfile
     container_name: med-manager-frontend
     ports:
