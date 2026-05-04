@@ -51,7 +51,7 @@ public class OcrService {
             
             return parseOcrResult(response.getBody());
         } catch (Exception e) {
-            log.error("OCR识别失败: {}", e.getMessage());
+            log.error("OCR璇嗗埆澶辫触: {}", e.getMessage());
             return mockRecognize();
         }
     }
@@ -75,7 +75,7 @@ public class OcrService {
             
             return cachedToken;
         } catch (Exception e) {
-            log.error("获取OCR Token失败: {}", e.getMessage());
+            log.error("鑾峰彇OCR Token澶辫触: {}", e.getMessage());
             return "";
         }
     }
@@ -97,21 +97,21 @@ public class OcrService {
             result.put("rawText", String.join("\n", lines));
             
             for (String line : lines) {
-                if (line.contains("名称") || line.contains("品名")) {
-                    result.put("name", line.replaceAll(".*[名称品名]+[:：]*", "").trim());
+                if (line.contains("Product") || line.contains("Product name")) {
+                    result.put("name", line.replaceAll(".*[Product]+[::]*", "").trim());
                 }
-                if (line.contains("规格")) {
-                    result.put("specification", line.replaceAll(".*规格+[:：]*", "").trim());
+                if (line.contains("Specification")) {
+                    result.put("specification", line.replaceAll(".*Specification+[::]*", "").trim());
                 }
-                if (line.contains("有效期") || line.contains("有效期至")) {
-                    result.put("expireDate", line.replaceAll(".*有效期[至]*[:：]*", "").trim());
+                if (line.contains("Expiration date")) {
+                    result.put("expireDate", line.replaceAll(".*Expiration date+[::]*", "").trim());
                 }
-                if (line.contains("生产") || line.contains("厂家")) {
-                    result.put("manufacturer", line.replaceAll(".*(生产|厂家)+[:：]*", "").trim());
+                if (line.contains("Manufacturer") || line.contains("Manufacturer name")) {
+                    result.put("manufacturer", line.replaceAll(".*(Manufacturer|Manufacturer name)+[::]*", "").trim());
                 }
             }
         } catch (Exception e) {
-            log.error("解析OCR结果失败: {}", e.getMessage());
+            log.error("OCR瑙ｆ瀽澶辫触: {}", e.getMessage());
         }
 
         return result;
@@ -123,8 +123,8 @@ public class OcrService {
         result.put("specification", "");
         result.put("expireDate", "");
         result.put("manufacturer", "");
-        result.put("rawText", "OCR服务未配置，请手动输入");
-        result.put("note", "演示模式 - 请配置百度OCR服务启用自动识别");
+        result.put("rawText", "OCR璇嗗埆澶辫触");   
+        result.put("note", "璇锋鏌ュ浘鐗囨槸鍚︽竻鏅帮紝鏄惁鍖呭惈鑽搧淇℃伅");
         return result;
     }
 }

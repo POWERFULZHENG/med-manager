@@ -17,12 +17,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
-                        "/user/login",
-                        "/user/register",
+                        "/auth/login",
                         "/doc.html",
                         "/webjars/**",
                         "/v3/api-docs/**",
-                        "/swagger-resources/**"
+                        "/swagger-resources/**",
+                        "/upload/**",
+                        "/actuator/**"
                 );
     }
 }

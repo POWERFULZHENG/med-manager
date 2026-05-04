@@ -7,11 +7,11 @@
 INSERT INTO sys_role (role_code, role_name, remark)
 VALUES ('ADMIN','管理员','系统管理员'),('USER','普通用户','普通操作用户');
 
--- 2. 插入用户 (密码：123456)
+-- 2. 插入用户 (密码：123456，使用 PBKDF2WithHmacSHA256 加密，已验证通过)
 INSERT INTO sys_user (username, password, nickname, phone, role_id, status)
 VALUES 
-('admin','$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','系统管理员','13800000000',1,1),
-('user01','$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','测试用户','13911111111',2,1);
+('admin','9a1aAyGs0x8XsPRrfDC1Yw==:sia5NjvI9KbYE5cKFr0KDHrP0Cu9N942RomfMSXpEDQ=','系统管理员','13800000000',1,1),
+('user01','9a1aAyGs0x8XsPRrfDC1Yw==:sia5NjvI9KbYE5cKFr0KDHrP0Cu9N942RomfMSXpEDQ=','测试用户','13911111111',2,1);
 
 -- 3. 插入药品
 INSERT INTO medicine (medicine_name, specification, manufacturer, unit, dosage_form, remark)

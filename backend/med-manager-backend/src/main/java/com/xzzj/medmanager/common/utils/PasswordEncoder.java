@@ -27,7 +27,7 @@ public class PasswordEncoder {
             String hashBase64 = Base64.getEncoder().encodeToString(hash);
             return saltBase64 + ":" + hashBase64;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException("�������ʧ��", e);
+            throw new RuntimeException("密码加密失败", e);
         }
     }
 
@@ -57,5 +57,13 @@ public class PasswordEncoder {
             diff |= a[i] ^ b[i];
         }
         return diff == 0;
+    }
+
+    public static void main(String[] args) {
+        String password = "123456";
+        String encoded = encode(password);
+        System.out.println("明文密码: " + password);
+        System.out.println("加密后的密码: " + encoded);
+        System.out.println("验证结果: " + matches(password, encoded));
     }
 }
