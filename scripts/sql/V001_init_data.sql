@@ -10,8 +10,8 @@ VALUES ('ADMIN','管理员','系统管理员'),('USER','普通用户','普通操
 -- 2. 插入用户 (密码：123456，使用 PBKDF2WithHmacSHA256 加密，已验证通过)
 INSERT INTO sys_user (username, password, nickname, phone, role_id, status)
 VALUES 
-('admin','9a1aAyGs0x8XsPRrfDC1Yw==:sia5NjvI9KbYE5cKFr0KDHrP0Cu9N942RomfMSXpEDQ=','系统管理员','13800000000',1,1),
-('user01','9a1aAyGs0x8XsPRrfDC1Yw==:sia5NjvI9KbYE5cKFr0KDHrP0Cu9N942RomfMSXpEDQ=','测试用户','13911111111',2,1);
+('admin','+MA==:pZS6+2GnsMEe5e3FjnO6HvgTt7nwGUb/S76jJ4iQb6Y=','系统管理员','13800000000',1,1),
+('user01','+MA==:pZS6+2GnsMEe5e3FjnO6HvgTt7nwGUb/S76jJ4iQb6Y=','测试用户','13911111111',2,1);
 
 -- 3. 插入药品
 INSERT INTO medicine (medicine_name, specification, manufacturer, unit, dosage_form, remark)

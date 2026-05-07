@@ -61,13 +61,35 @@
       </el-main>
     </el-container>
   </el-container>
+
+  <el-dialog 
+    v-model="logoutDialogVisible" 
+    title="确定退出登录吗？" 
+    align-center
+    :show-close="false"
+    :close-on-click-modal="false"
+    width="360px"
+  >
+    <div class="logout-dialog-content">
+      <div class="logout-icon">
+        <el-icon size="48" color="#E6A23C"><Warning /></el-icon>
+      </div>
+      <p>退出后将需要重新登录</p>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="logoutDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleLogout">确定退出</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { HomeFilled, Box, List, Warning, User, FirstAidKit, Bell, ArrowDown, SwitchButton } from '@element-plus/icons-vue'
 import { logout } from '../api/auth'
 
@@ -75,14 +97,21 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 const loading = ref(false)
+const logoutDialogVisible = ref(false)
 
-const menuItems = [
-  { index: '/dashboard', title: '首页', icon: HomeFilled },
-  { index: '/medicine', title: '药品管理', icon: Box },
-  { index: '/inventory', title: '库存管理', icon: List },
-  { index: '/expire', title: '过期提醒', icon: Warning },
-  { index: '/user', title: '个人中心', icon: User }
-]
+const menuItems = computed(() => {
+  const items = [
+    { index: '/dashboard', title: '首页', icon: HomeFilled },
+    { index: '/medicine', title: '药品管理', icon: Box },
+    { index: '/inventory', title: '库存管理', icon: List },
+    { index: '/expire', title: '过期提醒', icon: Warning },
+    { index: '/user/center', title: '个人中心', icon: User }
+  ]
+  if (userStore.userInfo?.roleCode === 'ADMIN') {
+    items.push({ index: '/user/list', title: '用户管理', icon: User })
+  }
+  return items
+})
 
 const activeMenu = computed(() => route.path)
 const currentTitle = computed(() => route.meta.title as string || '首页')
@@ -93,30 +122,38 @@ const handleMenuSelect = (index: string) => {
 
 const handleCommand = async (command: string) => {
   if (command === 'profile') {
-    router.push('/user')
+    router.push('/user/center')
   } else if (command === 'logout') {
-    try {
-      await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      
-      loading.value = true
-      await logout()
-      
-      userStore.logout()
-      ElMessage.success('退出登录成功')
-      router.push('/login')
-    } catch {
-    } finally {
-      loading.value = false
-    }
+    logoutDialogVisible.value = true
+  }
+}
+
+const handleLogout = async () => {
+  try {
+    loading.value = true
+    await logout()
+    userStore.logout()
+    router.push('/login')
+    ElMessage.success('退出成功')
+  } catch (error) {
+    ElMessage.error('退出失败')
+  } finally {
+    loading.value = false
+    logoutDialogVisible.value = false
   }
 }
 </script>
 
 <style scoped>
+/* 全局重置，让html/body铺满整个视口 */
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .layout-container {
   height: 100vh;
 }
@@ -195,5 +232,26 @@ const handleCommand = async (command: string) => {
   background: #f0f2f5;
   padding: 24px;
   overflow: auto;
+}
+
+.logout-dialog-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.logout-icon {
+  margin-bottom: 16px;
+}
+
+.logout-dialog-content p {
+  margin: 0;
+  color: #909399;
+  font-size: 14px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 }
 </style>

@@ -8,7 +8,8 @@ import Medicine from '../views/medicine/index.vue'
 import MedicineForm from '../views/medicine/form.vue'
 import Inventory from '../views/inventory/index.vue'
 import Expire from '../views/expire/index.vue'
-import User from '../views/user/index.vue'
+import UserCenter from '../views/user/center.vue'
+import UserList from '../views/user/list.vue'
 import NotFound from '../views/error/404.vue'
 
 const routes: RouteRecordRaw[] = [
@@ -55,10 +56,16 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '过期提醒', requiresAuth: true }
       },
       {
-        path: 'user',
-        name: 'User',
-        component: User,
+        path: 'user/center',
+        name: 'UserCenter',
+        component: UserCenter,
         meta: { title: '个人中心', requiresAuth: true }
+      },
+      {
+        path: 'user/list',
+        name: 'UserList',
+        component: UserList,
+        meta: { title: '用户管理', requiresAuth: true }
       }
     ]
   },
@@ -91,7 +98,7 @@ router.beforeEach((to, _from) => {
   if (to.path === '/login' && token) {
     return '/dashboard'
   }
-  
+
   return true
 })
 

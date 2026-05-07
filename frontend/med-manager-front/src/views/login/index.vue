@@ -1,6 +1,14 @@
 <template>
   <div class="login-container">
     <div class="login-box">
+      <div v-if="showLogoutTip" class="logout-tip">
+        <div class="logout-icon">
+          <span class="check-mark">✓</span>
+        </div>
+        <p class="logout-title">已安全退出</p>
+        <p class="logout-desc">期待您再次使用系统</p>
+      </div>
+      
       <h2 class="login-title">家庭常用药管理系统</h2>
       <el-form ref="formRef" :model="loginForm" :rules="rules" label-width="0">
         <el-form-item prop="username">
@@ -44,16 +52,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '../../stores/user'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { login, type LoginData } from '../../api/auth'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
+const showLogoutTip = ref(false)
 
 const loginForm = reactive<LoginData>({
   username: 'admin',
@@ -67,27 +77,45 @@ const rules = {
 
 const handleLogin = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async valid => {
     if (!valid) return
-    
+
     loading.value = true
-    
+
     try {
       const result = await login(loginForm)
-      
-      userStore.setToken(result.token)
-      userStore.setUserInfo(result.userInfo)
-      
-      ElMessage.success('登录成功')
-      router.push('/dashboard')
+
+      if (result.code === 200) {
+        userStore.setToken(result.data.token)
+        userStore.setUserInfo({
+          id: result.data.user.userId,
+          username: result.data.user.username,
+          nickname: result.data.user.nickname,
+          roleCode: result.data.user.roleCode
+        })
+
+        ElMessage.success('登录成功')
+        router.push('/dashboard')
+      } else {
+        ElMessage.error(result.message || '登录失败')
+      }
     } catch (error: any) {
-      ElMessage.error(error.message || '登录失败')
+      ElMessage.error(error.response?.data?.message || '登录失败')
     } finally {
       loading.value = false
     }
   })
 }
+
+onMounted(() => {
+  if (route.query.logout) {
+    showLogoutTip.value = true
+    setTimeout(() => {
+      showLogoutTip.value = false
+    }, 3000)
+  }
+})
 </script>
 
 <style scoped>
@@ -108,6 +136,45 @@ const handleLogin = async () => {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+.logout-tip {
+  text-align: center;
+  padding: 20px;
+  background: #f6ffed;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.logout-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #67c23a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+
+.check-mark {
+  font-size: 36px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.logout-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #67c23a;
+  margin: 0 0 8px 0;
+}
+
+.logout-desc {
+  font-size: 14px;
+  color: #999;
+  margin: 0;
+}
+
 .login-title {
   text-align: center;
   margin-bottom: 30px;
@@ -124,6 +191,17 @@ const handleLogin = async () => {
 
 .login-tip p {
   margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 

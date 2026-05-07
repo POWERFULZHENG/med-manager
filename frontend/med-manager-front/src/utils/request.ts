@@ -26,9 +26,9 @@ request.interceptors.response.use(
       const userStore = useUserStore()
       userStore.logout()
       router.push('/login')
-      ElMessage.error('��¼�ѹ��ڣ������µ�¼')
+      ElMessage.error('登录已过期，请重新登录')
     } else {
-      ElMessage.error(error.response?.data?.message || '����ʧ��')
+      ElMessage.error(error.response?.data?.message || '请求失败')
     }
     return Promise.reject(error)
   }
