@@ -1,6 +1,6 @@
 package com.xzzj.medmanager.common.utils;
 
-// import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -11,8 +11,8 @@ public class TokenBlacklist {
 
     private final Set<String> blacklist = ConcurrentHashMap.newKeySet();
 
-    // @Autowired
-    // private JwtUtils jwtUtils;
+    @Autowired
+    private JwtUtils jwtUtils;
 
     public void addToken(String token) {
         blacklist.add(token);
@@ -22,7 +22,11 @@ public class TokenBlacklist {
         return blacklist.contains(token);
     }
 
-    // public void removeExpiredTokens() {
-    //     blacklist.removeIf(token -> !JwtUtils.validateToken(token));
-    // }
+    public void removeExpiredTokens() {
+        blacklist.removeIf(token -> !jwtUtils.validateToken(token));
+    }
+
+    public int getBlacklistSize() {
+        return blacklist.size();
+    }
 }
