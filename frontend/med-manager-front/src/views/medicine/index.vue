@@ -1,270 +1,303 @@
 <template>
-  <el-card>
-    <template #header>
-      <div class="card-header">
-        <span>药品管理</span>
-        <el-button type="primary" @click="handleAdd">
-          + 新增药品
-        </el-button>
-      </div>
-    </template>
+  <div class="medicine-management">
+    <div class="search-bar">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="药品名称">
+          <el-input v-model="searchForm.medicineName" placeholder="请输入药品名称" style="width: 200px" clearable />
+        </el-form-item>
+        <el-form-item label="生产厂家">
+          <el-input v-model="searchForm.manufacturer" placeholder="请输入生产厂家" style="width: 200px" clearable />
+        </el-form-item>
+        <el-form-item label="剂型">
+          <el-select v-model="searchForm.dosageForm" placeholder="请选择剂型" style="width: 150px" clearable>
+            <el-option label="片剂" value="片剂" />
+            <el-option label="胶囊" value="胶囊" />
+            <el-option label="颗粒" value="颗粒" />
+            <el-option label="口服液" value="口服液" />
+            <el-option label="注射剂" value="注射剂" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">查询</el-button>
+          <el-button @click="handleReset">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
 
-    <el-form :model="searchForm" inline class="search-form">
-      <el-form-item label="药品名称">
-        <el-input v-model="searchForm.name" placeholder="请输入药品名称" clearable style="width: 200px" />
-      </el-form-item>
-      <el-form-item label="分类">
-        <el-select v-model="searchForm.category" placeholder="请选择" clearable style="width: 150px">
-          <el-option label="感冒药" value="感冒药" />
-          <el-option label="抗生素" value="抗生素" />
-          <el-option label="止痛药" value="止痛药" />
-          <el-option label="保健品" value="保健品" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch" :loading="loading">查询</el-button>
-        <el-button @click="handleReset">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <div class="action-bar">
+      <el-button type="primary" @click="handleAdd">新增药品</el-button>
+    </div>
 
-    <el-table :data="tableData" stripe v-loading="loading" style="width: 100%">
-      <el-table-column prop="name" label="药品名称" min-width="120" />
-      <el-table-column prop="spec" label="规格" min-width="120" />
-      <el-table-column prop="category" label="分类" width="100" />
-      <el-table-column prop="manufacturer" label="厂家" min-width="150" show-overflow-tooltip class="hide-mobile" />
-      <el-table-column prop="unit" label="单位" width="80" class="hide-mobile" />
-      <el-table-column prop="stock" label="库存数量" width="100">
-        <template #default="{ row }">
-          <span :class="{ 'text-danger': row.stock < 10 }">{{ row.stock }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="有效期状态" width="100">
-        <template #default="{ row }">
-          <MedStatusTag :days="row.expireDays" />
-        </template>
-      </el-table-column>
+    <el-table :data="tableData" v-loading="loading" border>
+      <el-table-column prop="id" label="药品ID" width="80" />
+      <el-table-column prop="medicineName" label="药品名称" min-width="150" />
+      <el-table-column prop="specification" label="规格" width="120" />
+      <el-table-column prop="manufacturer" label="生产厂家" min-width="150" show-overflow-tooltip />
+      <el-table-column prop="unit" label="单位" width="80" />
+      <el-table-column prop="dosageForm" label="剂型" width="100" />
+      <el-table-column prop="createdAt" label="创建时间" width="180" />
       <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
-          <el-button size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button size="small" @click="handleStock(row)">库存批次</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+          <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
+          <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      v-model:current-page="pagination.page"
-      v-model:page-size="pagination.size"
+      :current-page="pagination.current"
+      :page-size="pagination.size"
       :total="pagination.total"
-      class="pagination"
+      :page-sizes="[10, 20, 50, 100]"
       layout="total, sizes, prev, pager, next, jumper"
-      @size-change="handleSearch"
-      @current-change="handleSearch"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
     />
-  </el-card>
 
-  <el-dialog v-model="dialogVisible" :title="dialogTitle" width="600px" destroy-on-close>
-    <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-      <el-form-item label="药品名称" prop="name">
-        <el-input v-model="formData.name" placeholder="请输入药品名称" />
-      </el-form-item>
-      <el-form-item label="规格" prop="spec">
-        <el-input v-model="formData.spec" placeholder="如：0.5g*24粒" />
-      </el-form-item>
-      <el-form-item label="分类" prop="category">
-        <el-select v-model="formData.category" placeholder="请选择" style="width: 100%">
-          <el-option label="感冒药" value="感冒药" />
-          <el-option label="抗生素" value="抗生素" />
-          <el-option label="止痛药" value="止痛药" />
-          <el-option label="保健品" value="保健品" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="生产厂家">
-        <el-input v-model="formData.manufacturer" placeholder="请输入生产厂家" />
-      </el-form-item>
-      <el-form-item label="单位" prop="unit">
-        <el-select v-model="formData.unit" placeholder="请选择" style="width: 100%">
-          <el-option label="盒" value="盒" />
-          <el-option label="瓶" value="瓶" />
-          <el-option label="片" value="片" />
-          <el-option label="支" value="支" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="备注">
-        <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">确定</el-button>
-    </template>
-  </el-dialog>
+    <el-dialog :title="formTitle" v-model="dialogVisible" width="600px">
+      <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
+        <el-form-item label="药品名称" prop="medicineName">
+          <el-input v-model="formData.medicineName" placeholder="请输入药品名称" />
+        </el-form-item>
+        <el-form-item label="规格" prop="specification">
+          <el-input v-model="formData.specification" placeholder="如：0.5g*24粒" />
+        </el-form-item>
+        <el-form-item label="生产厂家" prop="manufacturer">
+          <el-input v-model="formData.manufacturer" placeholder="请输入生产厂家" />
+        </el-form-item>
+        <el-form-item label="单位" prop="unit">
+          <el-select v-model="formData.unit" placeholder="请选择单位" style="width: 100%">
+            <el-option label="盒" value="盒" />
+            <el-option label="瓶" value="瓶" />
+            <el-option label="片" value="片" />
+            <el-option label="支" value="支" />
+            <el-option label="袋" value="袋" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="剂型" prop="dosageForm">
+          <el-select v-model="formData.dosageForm" placeholder="请选择剂型" style="width: 100%">
+            <el-option label="片剂" value="片剂" />
+            <el-option label="胶囊" value="胶囊" />
+            <el-option label="颗粒" value="颗粒" />
+            <el-option label="口服液" value="口服液" />
+            <el-option label="注射剂" value="注射剂" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="formData.remark" type="textarea" :rows="3" placeholder="请输入备注" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleSubmit">确定</el-button>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import MedStatusTag from '../../components/MedStatusTag.vue'
+import {
+  getMedicineList,
+  createMedicine,
+  updateMedicine,
+  deleteMedicine,
+  type MedicineVO,
+  type MedicineRequest,
+  type MedicineQueryRequest
+} from '@/api/medicine'
 
 const loading = ref(false)
-const submitLoading = ref(false)
 const dialogVisible = ref(false)
+const formLoading = ref(false)
 const formRef = ref<FormInstance>()
-const isEdit = ref(false)
 
-const searchForm = reactive({
-  name: '',
-  category: ''
+const searchForm = reactive<MedicineQueryRequest>({
+  medicineName: '',
+  manufacturer: '',
+  dosageForm: '',
+  pageNum: 1,
+  pageSize: 10
 })
 
-const pagination = reactive({
-  page: 1,
+const pagination = ref({
+  current: 1,
   size: 10,
   total: 0
 })
 
-const formData = reactive({
-  id: 0,
-  name: '',
-  spec: '',
-  category: '',
+const tableData = ref<MedicineVO[]>([])
+
+const editMode = ref(false)
+const formTitle = computed(() => editMode.value ? '编辑药品' : '新增药品')
+const editingMedicineId = ref<number | null>(null)
+
+const formData = reactive<MedicineRequest>({
+  medicineName: '',
+  specification: '',
   manufacturer: '',
   unit: '',
+  dosageForm: '',
   remark: ''
 })
 
 const rules = {
-  name: [{ required: true, message: '请输入药品名称', trigger: 'blur' }],
-  spec: [{ required: true, message: '请输入规格', trigger: 'blur' }],
-  category: [{ required: true, message: '请选择分类', trigger: 'change' }],
-  unit: [{ required: true, message: '请选择单位', trigger: 'change' }]
+  medicineName: [
+    { required: true, message: '请输入药品名称', trigger: 'blur' },
+    { max: 100, message: '药品名称长度不能超过100个字符', trigger: 'blur' }
+  ],
+  unit: [
+    { required: true, message: '请选择单位', trigger: 'change' }
+  ]
 }
 
-const tableData = ref([
-  { id: 1, name: '感冒灵颗粒', spec: '10g*10袋', category: '感冒药', manufacturer: '三九医药', unit: '盒', stock: 15, expireDays: 256 },
-  { id: 2, name: '阿莫西林胶囊', spec: '0.5g*24粒', category: '抗生素', manufacturer: '华北制药', unit: '盒', stock: 5, expireDays: 15 },
-  { id: 3, name: '维生素C片', spec: '100mg*100片', category: '保健品', manufacturer: '汤臣倍健', unit: '瓶', stock: 80, expireDays: -3 },
-  { id: 4, name: '布洛芬缓释胶囊', spec: '0.3g*20粒', category: '止痛药', manufacturer: '中美史克', unit: '盒', stock: 20, expireDays: 7 }
-])
-
-pagination.total = tableData.value.length
-
-const dialogTitle = computed(() => isEdit.value ? '编辑药品' : '新增药品')
+const loadMedicineList = async () => {
+  loading.value = true
+  try {
+    const response = await getMedicineList({
+      ...searchForm,
+      pageNum: pagination.value.current,
+      pageSize: pagination.value.size
+    })
+    if (response.code === 200) {
+      tableData.value = response.data.records
+      pagination.value.total = response.data.total
+    } else {
+      ElMessage.error(response.message)
+    }
+  } catch (error) {
+    ElMessage.error('获取药品列表失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleSearch = () => {
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    ElMessage.success('查询成功')
-  }, 500)
+  pagination.value.current = 1
+  loadMedicineList()
 }
 
 const handleReset = () => {
-  searchForm.name = ''
-  searchForm.category = ''
-  handleSearch()
+  searchForm.medicineName = ''
+  searchForm.manufacturer = ''
+  searchForm.dosageForm = ''
+  pagination.value.current = 1
+  loadMedicineList()
 }
 
 const handleAdd = () => {
-  isEdit.value = false
-  Object.assign(formData, {
-    id: null,
-    name: '',
-    spec: '',
-    category: '',
-    manufacturer: '',
-    unit: '',
-    remark: ''
-  })
+  editMode.value = false
+  formData.medicineName = ''
+  formData.specification = ''
+  formData.manufacturer = ''
+  formData.unit = ''
+  formData.dosageForm = ''
+  formData.remark = ''
   dialogVisible.value = true
 }
 
-const handleEdit = (row: any) => {
-  isEdit.value = true
-  Object.assign(formData, row)
+const handleEdit = (row: MedicineVO) => {
+  editMode.value = true
+  editingMedicineId.value = row.id
+  formData.medicineName = row.medicineName
+  formData.specification = row.specification || ''
+  formData.manufacturer = row.manufacturer || ''
+  formData.unit = row.unit
+  formData.dosageForm = row.dosageForm || ''
+  formData.remark = row.remark || ''
   dialogVisible.value = true
-}
-
-const handleStock = (row: any) => {
-  ElMessage.info(`查看【${row.name}】的库存批次`)
-}
-
-const handleDelete = (row: any) => {
-  ElMessageBox.confirm(`确定要删除药品【${row.name}】吗？`, '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    const index = tableData.value.findIndex(item => item.id === row.id)
-    if (index > -1) {
-      tableData.value.splice(index, 1)
-      pagination.total--
-      ElMessage.success('删除成功')
-    }
-  }).catch(() => {})
 }
 
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async valid => {
     if (!valid) return
-    
-    submitLoading.value = true
-    
-    setTimeout(() => {
-      if (isEdit.value) {
-        const index = tableData.value.findIndex(item => item.id === formData.id)
-        if (index > -1) {
-          Object.assign(tableData.value[index], formData)
-        }
-        ElMessage.success('编辑成功')
+
+    formLoading.value = true
+    try {
+      let response
+      if (editMode.value && editingMedicineId.value) {
+        response = await updateMedicine(editingMedicineId.value, formData)
       } else {
-        tableData.value.push({
-          ...formData,
-          id: Date.now(),
-          stock: 0,
-          expireDays: 365
-        })
-        pagination.total++
-        ElMessage.success('新增成功')
+        response = await createMedicine(formData)
       }
-      submitLoading.value = false
-      dialogVisible.value = false
-    }, 800)
+
+      if (response.code === 200) {
+        ElMessage.success(editMode.value ? '编辑成功' : '新增成功')
+        dialogVisible.value = false
+        loadMedicineList()
+      } else {
+        ElMessage.error(response.message)
+      }
+    } catch (error) {
+      ElMessage.error(editMode.value ? '编辑失败' : '新增失败')
+    } finally {
+      formLoading.value = false
+    }
   })
 }
+
+const handleDelete = async (row: MedicineVO) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除药品 "${row.medicineName}" 吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const response = await deleteMedicine(row.id)
+    if (response.code === 200) {
+      ElMessage.success('删除成功')
+      loadMedicineList()
+    } else {
+      ElMessage.error(response.message)
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
+  }
+}
+
+const handleSizeChange = (size: number) => {
+  pagination.value.size = size
+  loadMedicineList()
+}
+
+const handleCurrentChange = (current: number) => {
+  pagination.value.current = current
+  loadMedicineList()
+}
+
+onMounted(() => {
+  loadMedicineList()
+})
 </script>
 
 <style scoped>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.medicine-management {
+  padding: 20px;
 }
 
-.search-form {
+.search-bar {
   margin-bottom: 20px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
 }
 
-.pagination {
+.action-bar {
+  margin-bottom: 16px;
+}
+
+:deep(.el-pagination) {
   margin-top: 20px;
   text-align: right;
 }
-
-.text-danger {
-  color: #f56c6c;
-  font-weight: bold;
-}
-
-@media (max-width: 768px) {
-  .hide-mobile {
-    display: none;
-  }
-  
-  .search-form .el-form-item {
-    width: 100%;
-  }
-}
 </style>
-
