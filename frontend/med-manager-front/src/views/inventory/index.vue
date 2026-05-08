@@ -1,208 +1,421 @@
-ï»¿<template>
-  <el-card>
-    <template #header>
-      <div class="card-header">
-        <span>åº“å­˜ç®¡ç†</span>
-        <el-button type="primary" @click="handleInStock">
-          + è¯å“å…¥åº“
-        </el-button>
-      </div>
-    </template>
+<template>
+  <div class="inventory-management">
+    <div class="search-bar">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="Ò©Æ·Ãû³Æ">
+          <el-input v-model="searchForm.medicineName" placeholder="ÇëÊäÈëÒ©Æ·Ãû³Æ" style="width: 200px" clearable />
+        </el-form-item>
+        <el-form-item label="´æ·ÅÎ»ÖÃ">
+          <el-input v-model="searchForm.storageLocation" placeholder="ÇëÊäÈë´æ·ÅÎ»ÖÃ" style="width: 200px" clearable />
+        </el-form-item>
+        <el-form-item label="×´Ì¬">
+          <el-select v-model="searchForm.isExpiring" placeholder="ÁÙÆÚ" style="width: 120px" clearable>
+            <el-option label="ÁÙÆÚÒ©Æ·" :value="true" />
+          </el-select>
+          <el-select v-model="searchForm.isExpired" placeholder="¹ıÆÚ" style="width: 120px; margin-left: 8px" clearable>
+            <el-option label="¹ıÆÚÒ©Æ·" :value="true" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">²éÑ¯</el-button>
+          <el-button @click="handleReset">ÖØÖÃ</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
 
-    <el-alert
-      title="åº“å­˜é¢„è­¦ï¼šä»¥ä¸‹è¯å“åº“å­˜ä¸è¶³ 10 ä»¶ï¼Œè¯·åŠæ—¶è¡¥å……ï¼"
-      type="warning"
-      :closable="false"
-      style="margin-bottom: 20px"
-      v-if="warningCount > 0"
-    />
+    <div class="action-bar">
+      <el-button type="primary" @click="handleInStock">Ò©Æ·Èë¿â</el-button>
+    </div>
 
-    <el-table :data="tableData" stripe v-loading="loading" style="width: 100%">
-      <el-table-column prop="name" label="è¯å“åç§°" min-width="120" />
-      <el-table-column prop="batchNo" label="æ‰¹æ¬¡å·" width="140" class="hide-mobile" />
-      <el-table-column prop="spec" label="è§„æ ¼" min-width="120" />
-      <el-table-column prop="quantity" label="å½“å‰åº“å­˜" width="120">
+    <el-table :data="tableData" v-loading="loading" border>
+      <el-table-column prop="medicineName" label="Ò©Æ·Ãû³Æ" min-width="150" />
+      <el-table-column prop="batchNo" label="Åú´ÎºÅ" width="140" />
+      <el-table-column prop="specification" label="¹æ¸ñ" width="120" />
+      <el-table-column prop="quantity" label="µ±Ç°¿â´æ" width="100">
         <template #default="{ row }">
           <el-tag :type="row.quantity < 10 ? 'danger' : 'success'">
             {{ row.quantity }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="unit" label="å•ä½" width="80" />
-      <el-table-column prop="expireDate" label="è¿‡æœŸæ—¥æœŸ" width="120" class="hide-mobile" />
-      <el-table-column label="æœ‰æ•ˆæœŸçŠ¶æ€" width="100">
+      <el-table-column prop="unit" label="µ¥Î»" width="80" />
+      <el-table-column prop="expireDate" label="¹ıÆÚÈÕÆÚ" width="120" />
+      <el-table-column label="ÓĞĞ§ÆÚ×´Ì¬" width="100">
         <template #default="{ row }">
-          <MedStatusTag :days="row.expireDays" />
+          <el-tag :type="getExpireTagType(row.expireDays)">
+            {{ getExpireText(row.expireDays) }}
+          </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="location" label="å­˜æ”¾ä½ç½®" width="120" class="hide-mobile" />
-      <el-table-column label="æ“ä½œ" width="180" fixed="right">
+      <el-table-column prop="storageLocation" label="´æ·ÅÎ»ÖÃ" width="120" />
+      <el-table-column label="²Ù×÷" width="200" fixed="right">
         <template #default="{ row }">
-          <el-button size="small" @click="handleIn(row)">å…¥åº“</el-button>
-          <el-button size="small" @click="handleOut(row)" :disabled="row.quantity === 0">å‡ºåº“</el-button>
+          <el-button link type="primary" @click="handleIn(row)">Èë¿â</el-button>
+          <el-button link type="primary" @click="handleOut(row)" :disabled="row.quantity === 0">³ö¿â</el-button>
+          <el-button link type="primary" @click="handleAdjust(row)">µ÷Õû</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <el-pagination
-      v-model:current-page="pagination.page"
-      v-model:page-size="pagination.size"
+      :current-page="pagination.current"
+      :page-size="pagination.size"
       :total="pagination.total"
-      class="pagination"
-      layout="total, sizes, prev, pager, next"
+      :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next, jumper"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
     />
-  </el-card>
 
-  <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
-    <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
-      <el-form-item label="è¯å“">
-        <el-input :value="currentMedicine" disabled />
-      </el-form-item>
-      <el-form-item label="æ“ä½œæ•°é‡" prop="quantity">
-        <el-input-number
-          v-model="formData.quantity"
-          :min="1"
-          :max="maxQuantity"
-          style="width: 100%"
-        />
-        <span class="form-tip">å•ä½ï¼š({{ currentUnit }})</span>
-      </el-form-item>
-      <el-form-item label="å¤‡æ³¨">
-        <el-input v-model="formData.remark" type="textarea" :rows="3" />
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="dialogVisible = false">å–æ¶ˆ</el-button>
-      <el-button type="primary" :loading="submitLoading" @click="handleSubmit">ç¡®å®š</el-button>
-    </template>
-  </el-dialog>
+    <el-dialog title="Ò©Æ·Èë¿â" v-model="inStockDialogVisible" width="600px">
+      <el-form ref="inStockFormRef" :model="inStockFormData" :rules="inStockRules" label-width="100px">
+        <el-form-item label="Ò©Æ·" prop="medicineId">
+          <el-select v-model="inStockFormData.medicineId" placeholder="ÇëÑ¡ÔñÒ©Æ·" style="width: 100%" filterable>
+            <el-option
+              v-for="item in medicineList"
+              :key="item.id"
+              :label="item.medicineName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Åú´ÎºÅ" prop="batchNo">
+          <el-input v-model="inStockFormData.batchNo" placeholder="ÇëÊäÈëÅú´ÎºÅ" />
+        </el-form-item>
+        <el-form-item label="ÊıÁ¿" prop="quantity">
+          <el-input-number v-model="inStockFormData.quantity" :min="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="¹ıÆÚÈÕÆÚ" prop="expireDate">
+          <el-date-picker v-model="inStockFormData.expireDate" type="date" placeholder="ÇëÑ¡Ôñ¹ıÆÚÈÕÆÚ" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="´æ·ÅÎ»ÖÃ">
+          <el-input v-model="inStockFormData.storageLocation" placeholder="ÇëÊäÈë´æ·ÅÎ»ÖÃ" />
+        </el-form-item>
+        <el-form-item label="±¸×¢">
+          <el-input v-model="inStockFormData.remark" type="textarea" :rows="3" placeholder="ÇëÊäÈë±¸×¢" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="inStockDialogVisible = false">È¡Ïû</el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleInStockSubmit">È·¶¨</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog :title="operationTitle" v-model="operationDialogVisible" width="500px">
+      <el-form ref="operationFormRef" :model="operationFormData" :rules="operationRules" label-width="100px">
+        <el-form-item label="Ò©Æ·">
+          <el-input :value="currentStock?.medicineName" disabled />
+        </el-form-item>
+        <el-form-item label="Åú´ÎºÅ">
+          <el-input :value="currentStock?.batchNo" disabled />
+        </el-form-item>
+        <el-form-item label="µ±Ç°¿â´æ">
+          <el-input :value="`${currentStock?.quantity} ${currentStock?.unit}`" disabled />
+        </el-form-item>
+        <el-form-item label="²Ù×÷ÊıÁ¿" prop="quantity">
+          <el-input-number
+            v-model="operationFormData.quantity"
+            :min="1"
+            :max="operationType === 'out' ? currentStock?.quantity : 9999"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="±¸×¢">
+          <el-input v-model="operationFormData.remark" type="textarea" :rows="3" placeholder="ÇëÊäÈë±¸×¢" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="operationDialogVisible = false">È¡Ïû</el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleOperationSubmit">È·¶¨</el-button>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import MedStatusTag from '../../components/MedStatusTag.vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
+import {
+  getStockList,
+  stockIn,
+  stockOut,
+  adjustStock,
+  type StockVO,
+  type StockInRequest,
+  type StockOutRequest,
+  type StockAdjustRequest,
+  type StockQueryRequest
+} from '@/api/stock'
+import { getMedicineList, type MedicineVO } from '@/api/medicine'
 
 const loading = ref(false)
-const submitLoading = ref(false)
-const dialogVisible = ref(false)
-const operationType = ref<'in' | 'out'>('in')
-const currentMedicine = ref('')
-const currentUnit = ref('ç›’')
+const formLoading = ref(false)
+const inStockDialogVisible = ref(false)
+const operationDialogVisible = ref(false)
+const inStockFormRef = ref<FormInstance>()
+const operationFormRef = ref<FormInstance>()
 
-const tableData = ref([
-  { id: 1, name: 'æ„Ÿå†’çµé¢—ç²’', batchNo: 'B202601001', spec: '10g*10è¢‹', quantity: 15, unit: 'ç›’', expireDate: '2026-12-31', expireDays: 256, location: 'è¯æŸœA-01' },
-  { id: 2, name: 'é˜¿è«è¥¿æ—èƒ¶å›Š', batchNo: 'B202601002', spec: '0.5g*24ç²’', quantity: 5, unit: 'ç›’', expireDate: '2027-06-30', expireDays: 15, location: 'è¯æŸœA-02' },
-  { id: 3, name: 'ç»´ç”Ÿç´ Cç‰‡', batchNo: 'B202601003', spec: '100mg*100ç‰‡', quantity: 80, unit: 'ç“¶', expireDate: '2026-04-27', expireDays: -3, location: 'è¯æŸœB-01' },
-  { id: 4, name: 'å¸ƒæ´›èŠ¬ç¼“é‡Šèƒ¶å›Š', batchNo: 'B202601004', spec: '0.3g*20ç²’', quantity: 20, unit: 'ç›’', expireDate: '2026-05-07', expireDays: 7, location: 'è¯æŸœB-02' }
-])
-
-const pagination = reactive({
-  page: 1,
-  size: 10,
-  total: tableData.value.length
+const searchForm = reactive<StockQueryRequest>({
+  medicineName: '',
+  isExpiring: undefined,
+  isExpired: undefined,
+  storageLocation: '',
+  pageNum: 1,
+  pageSize: 10
 })
 
-const formData = reactive({
+const pagination = ref({
+  current: 1,
+  size: 10,
+  total: 0
+})
+
+const tableData = ref<StockVO[]>([])
+const medicineList = ref<MedicineVO[]>([])
+
+const operationType = ref<'in' | 'out' | 'adjust'>('in')
+const currentStock = ref<StockVO | null>(null)
+
+const inStockFormData = reactive<StockInRequest>({
+  medicineId: 0,
+  batchNo: '',
+  quantity: 1,
+  expireDate: '',
+  storageLocation: '',
+  remark: ''
+})
+
+const operationFormData = reactive({
   quantity: 1,
   remark: ''
 })
 
-const rules = {
-  quantity: [{ required: true, message: 'è¯·è¾“å…¥æ•°é‡', trigger: 'blur' }]
+const inStockRules = {
+  medicineId: [{ required: true, message: 'ÇëÑ¡ÔñÒ©Æ·', trigger: 'change' }],
+  batchNo: [{ required: true, message: 'ÇëÊäÈëÅú´ÎºÅ', trigger: 'blur' }],
+  quantity: [{ required: true, message: 'ÇëÊäÈëÊıÁ¿', trigger: 'blur' }],
+  expireDate: [{ required: true, message: 'ÇëÑ¡Ôñ¹ıÆÚÈÕÆÚ', trigger: 'change' }]
 }
 
-const warningCount = computed(() => tableData.value.filter(item => item.quantity < 10).length)
+const operationRules = {
+  quantity: [{ required: true, message: 'ÇëÊäÈëÊıÁ¿', trigger: 'blur' }]
+}
 
-const dialogTitle = computed(() => operationType.value === 'in' ? 'è¯å“å…¥åº“' : 'è¯å“å‡ºåº“')
+const operationTitle = computed(() => {
+  if (operationType.value === 'in') return 'Ò©Æ·Èë¿â'
+  if (operationType.value === 'out') return 'Ò©Æ·³ö¿â'
+  return '¿â´æµ÷Õû'
+})
 
-const maxQuantity = computed(() => operationType.value === 'out' ? 9999 : 9999)
+const getExpireTagType = (days: number) => {
+  if (days < 0) return 'danger'
+  if (days <= 7) return 'danger'
+  if (days <= 30) return 'warning'
+  return 'success'
+}
+
+const getExpireText = (days: number) => {
+  if (days < 0) return `ÒÑ¹ıÆÚ${Math.abs(days)}Ìì`
+  if (days === 0) return '½ñÈÕ¹ıÆÚ'
+  if (days <= 7) return `${days}Ììºó¹ıÆÚ`
+  if (days <= 30) return `${days}Ììºó¹ıÆÚ`
+  return 'Õı³£'
+}
+
+const loadStockList = async () => {
+  loading.value = true
+  try {
+    const response = await getStockList({
+      ...searchForm,
+      pageNum: pagination.value.current,
+      pageSize: pagination.value.size
+    })
+    if (response.code === 200) {
+      tableData.value = response.data.records
+      pagination.value.total = response.data.total
+    } else {
+      ElMessage.error(response.message)
+    }
+  } catch (error) {
+    ElMessage.error('»ñÈ¡¿â´æÁĞ±íÊ§°Ü')
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadMedicineList = async () => {
+  try {
+    const response = await getMedicineList({ pageNum: 1, pageSize: 1000 })
+    if (response.code === 200) {
+      medicineList.value = response.data.records
+    }
+  } catch (error) {
+    console.error('»ñÈ¡Ò©Æ·ÁĞ±íÊ§°Ü', error)
+  }
+}
+
+const handleSearch = () => {
+  pagination.value.current = 1
+  loadStockList()
+}
+
+const handleReset = () => {
+  searchForm.medicineName = ''
+  searchForm.isExpiring = undefined
+  searchForm.isExpired = undefined
+  searchForm.storageLocation = ''
+  pagination.value.current = 1
+  loadStockList()
+}
 
 const handleInStock = () => {
-  ElMessage.info('è¯·å…ˆé€‰æ‹©è¯å“')
+  inStockFormData.medicineId = 0
+  inStockFormData.batchNo = ''
+  inStockFormData.quantity = 1
+  inStockFormData.expireDate = ''
+  inStockFormData.storageLocation = ''
+  inStockFormData.remark = ''
+  inStockDialogVisible.value = true
 }
 
-const handleIn = (row: any) => {
+const handleIn = (row: StockVO) => {
   operationType.value = 'in'
-  currentMedicine.value = row.name
-  currentUnit.value = row.unit
-  formData.quantity = 1
-  formData.remark = ''
-  dialogVisible.value = true
+  currentStock.value = row
+  operationFormData.quantity = 1
+  operationFormData.remark = ''
+  operationDialogVisible.value = true
 }
 
-const handleOut = async (row: any) => {
+const handleOut = async (row: StockVO) => {
   if (row.expireDays < 0) {
     try {
       await ElMessageBox.confirm(
-        'è¯¥è¯å“å·²è¿‡æœŸï¼Œå»ºè®®é”€æ¯ï¼Œè¯·ç¡®è®¤æ˜¯å¦ç»§ç»­é¢†å–ï¼Ÿ',
-        'è¿‡æœŸè¯å“è­¦å‘Š',
+        '¸ÃÒ©Æ·ÒÑ¹ıÆÚ£¬½¨ÒéÏú»Ù£¬ÇëÈ·ÈÏÊÇ·ñ¼ÌĞøÁìÈ¡£¿',
+        '¹ıÆÚÒ©Æ·¾¯¸æ',
         {
-          confirmButtonText: 'ç¡®è®¤é¢†å–',
-          cancelButtonText: 'å–æ¶ˆ',
-          type: 'error',
-          confirmButtonClass: 'el-button--danger'
-        }
-      )
-    } catch {
-      return
-    }
-  } else if (row.quantity === 1) {
-    try {
-      await ElMessageBox.confirm(
-        'æ­¤æ“ä½œå°†å¯¼è‡´è¯¥æ‰¹æ¬¡åº“å­˜æ¸…é›¶ï¼Œè¯·ç¡®è®¤ï¼',
-        'æç¤º',
-        {
-          confirmButtonText: 'ç¡®å®š',
-          cancelButtonText: 'å–æ¶ˆ',
-          type: 'warning'
+          confirmButtonText: 'È·ÈÏÁìÈ¡',
+          cancelButtonText: 'È¡Ïû',
+          type: 'error'
         }
       )
     } catch {
       return
     }
   }
-  
+
   operationType.value = 'out'
-  currentMedicine.value = row.name
-  currentUnit.value = row.unit
-  formData.quantity = 1
-  formData.remark = ''
-  dialogVisible.value = true
+  currentStock.value = row
+  operationFormData.quantity = 1
+  operationFormData.remark = ''
+  operationDialogVisible.value = true
 }
 
-const handleSubmit = () => {
-  submitLoading.value = true
-  setTimeout(() => {
-    ElMessage.success(operationType.value === 'in' ? 'å…¥åº“æˆåŠŸ' : 'å‡ºåº“æˆåŠŸ')
-    submitLoading.value = false
-    dialogVisible.value = false
-  }, 800)
+const handleAdjust = (row: StockVO) => {
+  operationType.value = 'adjust'
+  currentStock.value = row
+  operationFormData.quantity = row.quantity
+  operationFormData.remark = ''
+  operationDialogVisible.value = true
 }
+
+const handleInStockSubmit = async () => {
+  if (!inStockFormRef.value) return
+
+  await inStockFormRef.value.validate(async valid => {
+    if (!valid) return
+
+    formLoading.value = true
+    try {
+      const response = await stockIn({
+        ...inStockFormData,
+        expireDate: new Date(inStockFormData.expireDate).toISOString().split('T')[0]
+      })
+      if (response.code === 200) {
+        ElMessage.success('Èë¿â³É¹¦')
+        inStockDialogVisible.value = false
+        loadStockList()
+      } else {
+        ElMessage.error(response.message)
+      }
+    } catch (error) {
+      ElMessage.error('Èë¿âÊ§°Ü')
+    } finally {
+      formLoading.value = false
+    }
+  })
+}
+
+const handleOperationSubmit = async () => {
+  if (!operationFormRef.value) return
+
+  await operationFormRef.value.validate(async valid => {
+    if (!valid) return
+
+    formLoading.value = true
+    try {
+      let response
+      if (operationType.value === 'out' && currentStock.value) {
+        response = await stockOut({
+          stockId: currentStock.value.id,
+          quantity: operationFormData.quantity,
+          remark: operationFormData.remark
+        })
+      } else if (operationType.value === 'adjust' && currentStock.value) {
+        response = await adjustStock(currentStock.value.id, {
+          quantity: operationFormData.quantity,
+          remark: operationFormData.remark
+        })
+      }
+
+      if (response && response.code === 200) {
+        ElMessage.success(operationType.value === 'out' ? '³ö¿â³É¹¦' : 'µ÷Õû³É¹¦')
+        operationDialogVisible.value = false
+        loadStockList()
+      } else if (response) {
+        ElMessage.error(response.message)
+      }
+    } catch (error) {
+      ElMessage.error(operationType.value === 'out' ? '³ö¿âÊ§°Ü' : 'µ÷ÕûÊ§°Ü')
+    } finally {
+      formLoading.value = false
+    }
+  })
+}
+
+const handleSizeChange = (size: number) => {
+  pagination.value.size = size
+  loadStockList()
+}
+
+const handleCurrentChange = (current: number) => {
+  pagination.value.current = current
+  loadStockList()
+}
+
+onMounted(() => {
+  loadStockList()
+  loadMedicineList()
+})
 </script>
 
 <style scoped>
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.inventory-management {
+  padding: 20px;
 }
 
-.pagination {
+.search-bar {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.action-bar {
+  margin-bottom: 16px;
+}
+
+:deep(.el-pagination) {
   margin-top: 20px;
   text-align: right;
 }
-
-.form-tip {
-  font-size: 12px;
-  color: #999;
-  margin-left: 8px;
-}
-
-@media (max-width: 768px) {
-  .hide-mobile {
-    display: none;
-  }
-}
 </style>
-
