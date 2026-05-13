@@ -1,21 +1,49 @@
+<template>
+  <router-view />
+</template>
+
 <script setup lang="ts">
-import { ref } from 'vue'
-// 无需手动导入组件，直接使用
-const drawerVisible = ref(false)
-const dialogVisible = ref(false)
 </script>
 
-<template>
-  <div style="padding: 20px;">
-    <h1>Element Plus 引入成功 ✅</h1>
-    <!-- Element Plus 按钮 -->
-    <el-button type="primary">主要按钮</el-button>
-    <el-button type="success">成功按钮</el-button>
-    <!-- 测试你要用的 Drawer/Dialog -->
-    <el-button @click="drawerVisible = true">打开抽屉</el-button>
-    <el-button @click="dialogVisible = true">打开弹窗</el-button>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    <el-drawer v-model="drawerVisible" title="抽屉测试"></el-drawer>
-    <el-dialog v-model="dialogVisible" title="弹窗测试"></el-dialog>
-  </div>
-</template>
+html, body, #app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root .el-message-box__wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  min-height: 100vh !important;
+}
+
+:root .el-message-box__wrapper .el-message-box {
+  position: relative !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}
+</style>
+

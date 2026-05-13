@@ -1,29 +1,51 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:medmanager}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME:zzq}
-    password: ${DB_PASSWORD:123}
+    url: jdbc:mysql://localhost:3306/medmanager?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: zzq
+    password: 123
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 0
+      timeout: 3000ms
+
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.xzzj.medmanager.entity
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    map-underscore-to-camel-case: true
-  global-config:
-    db-config:
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
-
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:86400000}
 
 logging:
   level:
-    com.xzzj.medmanager: debug
-    org.springframework.web: info
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+    com.xzzj.medmanager: DEBUG
+    org.springframework.web: INFO
+
+jwt:
+  secret: um1OjhhF/l528mPyDyVaca0KwCHF6TPD1fb7kmktVN4=
+  expiration: 86400000
+
+ocr:
+  baidu:
+    api-key: ${OCR_BAIDU_API_KEY:}
+    secret-key: ${OCR_BAIDU_SECRET_KEY:}
