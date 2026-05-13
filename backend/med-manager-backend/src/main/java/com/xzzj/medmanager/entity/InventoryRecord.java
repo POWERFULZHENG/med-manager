@@ -21,14 +21,20 @@ public class InventoryRecord {
     @TableField("medicine_id")
     private Long medicineId;
 
-    @TableField("operation_type")
-    private String operationType;
+    @TableField("operator_id")
+    private Long operatorId;
 
-    @TableField("quantity")
-    private Integer quantity;
+    @TableField("record_type")
+    private String recordType;
 
-    @TableField("operator")
-    private String operator;
+    @TableField("quantity_change")
+    private Integer quantityChange;
+
+    @TableField("before_quantity")
+    private Integer beforeQuantity;
+
+    @TableField("after_quantity")
+    private Integer afterQuantity;
 
     @TableField("remark")
     private String remark;

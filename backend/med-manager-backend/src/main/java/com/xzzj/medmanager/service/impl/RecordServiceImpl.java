@@ -42,11 +42,7 @@ public class RecordServiceImpl implements IRecordService {
         }
 
         if (StringUtils.hasText(queryRequest.getOperationType())) {
-            wrapper.eq(InventoryRecord::getOperationType, queryRequest.getOperationType());
-        }
-
-        if (StringUtils.hasText(queryRequest.getOperator())) {
-            wrapper.like(InventoryRecord::getOperator, queryRequest.getOperator());
+            wrapper.eq(InventoryRecord::getRecordType, queryRequest.getOperationType());
         }
 
         if (queryRequest.getStartTime() != null) {

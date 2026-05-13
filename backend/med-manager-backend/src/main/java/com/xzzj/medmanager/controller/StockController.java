@@ -1,7 +1,7 @@
 package com.xzzj.medmanager.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.xzzj.medmanager.common.R;
+import com.xzzj.medmanager.common.result.R;
 import com.xzzj.medmanager.dto.*;
 import com.xzzj.medmanager.service.IStockService;
 import com.xzzj.medmanager.vo.StockVO;

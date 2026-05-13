@@ -98,9 +98,11 @@ public class StockServiceImpl implements IStockService {
         InventoryRecord record = new InventoryRecord();
         record.setStockId(stock.getId());
         record.setMedicineId(request.getMedicineId());
-        record.setOperationType("IN");
-        record.setQuantity(request.getQuantity());
-        record.setOperator("system");
+        record.setOperatorId(1L);
+        record.setRecordType("IN");
+        record.setQuantityChange(request.getQuantity());
+        record.setBeforeQuantity(0);
+        record.setAfterQuantity(request.getQuantity());
         record.setRemark(request.getRemark());
         record.setCreatedAt(LocalDateTime.now());
         recordMapper.insert(record);
@@ -120,16 +122,21 @@ public class StockServiceImpl implements IStockService {
             throw new RuntimeException("Insufficient stock");
         }
 
-        stock.setQuantity(stock.getQuantity() - request.getQuantity());
+        Integer beforeQuantity = stock.getQuantity();
+        Integer afterQuantity = beforeQuantity - request.getQuantity();
+        
+        stock.setQuantity(afterQuantity);
         stock.setUpdatedAt(LocalDateTime.now());
         stockMapper.updateById(stock);
 
         InventoryRecord record = new InventoryRecord();
         record.setStockId(request.getStockId());
         record.setMedicineId(stock.getMedicineId());
-        record.setOperationType("OUT");
-        record.setQuantity(request.getQuantity());
-        record.setOperator("system");
+        record.setOperatorId(1L);
+        record.setRecordType("OUT");
+        record.setQuantityChange(-request.getQuantity());
+        record.setBeforeQuantity(beforeQuantity);
+        record.setAfterQuantity(afterQuantity);
         record.setRemark(request.getRemark());
         record.setCreatedAt(LocalDateTime.now());
         recordMapper.insert(record);
@@ -143,17 +150,22 @@ public class StockServiceImpl implements IStockService {
             throw new RuntimeException("Stock not found");
         }
 
-        Integer oldQuantity = stock.getQuantity();
-        stock.setQuantity(request.getQuantity());
+        Integer beforeQuantity = stock.getQuantity();
+        Integer afterQuantity = request.getQuantity();
+        Integer quantityChange = afterQuantity - beforeQuantity;
+        
+        stock.setQuantity(afterQuantity);
         stock.setUpdatedAt(LocalDateTime.now());
         stockMapper.updateById(stock);
 
         InventoryRecord record = new InventoryRecord();
         record.setStockId(id);
         record.setMedicineId(stock.getMedicineId());
-        record.setOperationType("ADJUST");
-        record.setQuantity(request.getQuantity() - oldQuantity);
-        record.setOperator("system");
+        record.setOperatorId(1L);
+        record.setRecordType("ADJUST");
+        record.setQuantityChange(quantityChange);
+        record.setBeforeQuantity(beforeQuantity);
+        record.setAfterQuantity(afterQuantity);
         record.setRemark(request.getRemark());
         record.setCreatedAt(LocalDateTime.now());
         recordMapper.insert(record);

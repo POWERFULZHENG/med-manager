@@ -1,7 +1,7 @@
 package com.xzzj.medmanager.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.xzzj.medmanager.common.R;
+import com.xzzj.medmanager.common.result.R;
 import com.xzzj.medmanager.dto.RecordQueryRequest;
 import com.xzzj.medmanager.service.IRecordService;
 import com.xzzj.medmanager.vo.RecordVO;

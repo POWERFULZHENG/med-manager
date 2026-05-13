@@ -2,57 +2,57 @@
   <div class="inventory-management">
     <div class="search-bar">
       <el-form :model="searchForm" inline>
-        <el-form-item label="Ò©Æ·Ãû³Æ">
-          <el-input v-model="searchForm.medicineName" placeholder="ÇëÊäÈëÒ©Æ·Ãû³Æ" style="width: 200px" clearable />
+        <el-form-item label="è¯å“åç§°">
+          <el-input v-model="searchForm.medicineName" placeholder="è¯·è¾“å…¥è¯å“åç§°" style="width: 200px" clearable />
         </el-form-item>
-        <el-form-item label="´æ·ÅÎ»ÖÃ">
-          <el-input v-model="searchForm.storageLocation" placeholder="ÇëÊäÈë´æ·ÅÎ»ÖÃ" style="width: 200px" clearable />
+        <el-form-item label="å­˜æ”¾ä½ç½®">
+          <el-input v-model="searchForm.storageLocation" placeholder="è¯·è¾“å…¥å­˜æ”¾ä½ç½®" style="width: 200px" clearable />
         </el-form-item>
-        <el-form-item label="×´Ì¬">
-          <el-select v-model="searchForm.isExpiring" placeholder="ÁÙÆÚ" style="width: 120px" clearable>
-            <el-option label="ÁÙÆÚÒ©Æ·" :value="true" />
+        <el-form-item label="çŠ¶æ€">
+          <el-select v-model="searchForm.isExpiring" placeholder="ä¸´æœŸ" style="width: 120px" clearable>
+            <el-option label="ä¸´æœŸè¯å“" :value="true" />
           </el-select>
-          <el-select v-model="searchForm.isExpired" placeholder="¹ıÆÚ" style="width: 120px; margin-left: 8px" clearable>
-            <el-option label="¹ıÆÚÒ©Æ·" :value="true" />
+          <el-select v-model="searchForm.isExpired" placeholder="è¿‡æœŸ" style="width: 120px; margin-left: 8px" clearable>
+            <el-option label="è¿‡æœŸè¯å“" :value="true" />
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">²éÑ¯</el-button>
-          <el-button @click="handleReset">ÖØÖÃ</el-button>
+          <el-button type="primary" @click="handleSearch">æŸ¥è¯¢</el-button>
+          <el-button @click="handleReset">é‡ç½®</el-button>
         </el-form-item>
       </el-form>
     </div>
 
     <div class="action-bar">
-      <el-button type="primary" @click="handleInStock">Ò©Æ·Èë¿â</el-button>
+      <el-button type="primary" @click="handleInStock">è¯å“å…¥åº“</el-button>
     </div>
 
     <el-table :data="tableData" v-loading="loading" border>
-      <el-table-column prop="medicineName" label="Ò©Æ·Ãû³Æ" min-width="150" />
-      <el-table-column prop="batchNo" label="Åú´ÎºÅ" width="140" />
-      <el-table-column prop="specification" label="¹æ¸ñ" width="120" />
-      <el-table-column prop="quantity" label="µ±Ç°¿â´æ" width="100">
+      <el-table-column prop="medicineName" label="è¯å“åç§°" min-width="150" />
+      <el-table-column prop="batchNo" label="æ‰¹æ¬¡å·" width="140" />
+      <el-table-column prop="specification" label="è§„æ ¼" width="120" />
+      <el-table-column prop="quantity" label="å½“å‰åº“å­˜" width="100">
         <template #default="{ row }">
           <el-tag :type="row.quantity < 10 ? 'danger' : 'success'">
             {{ row.quantity }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="unit" label="µ¥Î»" width="80" />
-      <el-table-column prop="expireDate" label="¹ıÆÚÈÕÆÚ" width="120" />
-      <el-table-column label="ÓĞĞ§ÆÚ×´Ì¬" width="100">
+      <el-table-column prop="unit" label="å•ä½" width="80" />
+      <el-table-column prop="expireDate" label="è¿‡æœŸæ—¥æœŸ" width="120" />
+      <el-table-column label="æœ‰æ•ˆæœŸçŠ¶æ€" width="100">
         <template #default="{ row }">
           <el-tag :type="getExpireTagType(row.expireDays)">
             {{ getExpireText(row.expireDays) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="storageLocation" label="´æ·ÅÎ»ÖÃ" width="120" />
-      <el-table-column label="²Ù×÷" width="200" fixed="right">
+      <el-table-column prop="storageLocation" label="å­˜æ”¾ä½ç½®" width="120" />
+      <el-table-column label="æ“ä½œ" width="200" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" @click="handleIn(row)">Èë¿â</el-button>
-          <el-button link type="primary" @click="handleOut(row)" :disabled="row.quantity === 0">³ö¿â</el-button>
-          <el-button link type="primary" @click="handleAdjust(row)">µ÷Õû</el-button>
+          <el-button link type="primary" @click="handleIn(row)">å…¥åº“</el-button>
+          <el-button link type="primary" @click="handleOut(row)" :disabled="row.quantity === 0">å‡ºåº“</el-button>
+          <el-button link type="primary" @click="handleAdjust(row)">è°ƒæ•´</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -67,10 +67,10 @@
       @current-change="handleCurrentChange"
     />
 
-    <el-dialog title="Ò©Æ·Èë¿â" v-model="inStockDialogVisible" width="600px">
+    <el-dialog title="è¯å“å…¥åº“" v-model="inStockDialogVisible" width="600px">
       <el-form ref="inStockFormRef" :model="inStockFormData" :rules="inStockRules" label-width="100px">
-        <el-form-item label="Ò©Æ·" prop="medicineId">
-          <el-select v-model="inStockFormData.medicineId" placeholder="ÇëÑ¡ÔñÒ©Æ·" style="width: 100%" filterable>
+        <el-form-item label="è¯å“" prop="medicineId">
+          <el-select v-model="inStockFormData.medicineId" placeholder="è¯·é€‰æ‹©è¯å“" style="width: 100%" filterable>
             <el-option
               v-for="item in medicineList"
               :key="item.id"
@@ -79,40 +79,40 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="Åú´ÎºÅ" prop="batchNo">
-          <el-input v-model="inStockFormData.batchNo" placeholder="ÇëÊäÈëÅú´ÎºÅ" />
+        <el-form-item label="æ‰¹æ¬¡å·" prop="batchNo">
+          <el-input v-model="inStockFormData.batchNo" placeholder="è¯·è¾“å…¥æ‰¹æ¬¡å·" />
         </el-form-item>
-        <el-form-item label="ÊıÁ¿" prop="quantity">
+        <el-form-item label="æ•°é‡" prop="quantity">
           <el-input-number v-model="inStockFormData.quantity" :min="1" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="¹ıÆÚÈÕÆÚ" prop="expireDate">
-          <el-date-picker v-model="inStockFormData.expireDate" type="date" placeholder="ÇëÑ¡Ôñ¹ıÆÚÈÕÆÚ" style="width: 100%" />
+        <el-form-item label="è¿‡æœŸæ—¥æœŸ" prop="expireDate">
+          <el-date-picker v-model="inStockFormData.expireDate" type="date" placeholder="è¯·é€‰æ‹©è¿‡æœŸæ—¥æœŸ" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="´æ·ÅÎ»ÖÃ">
-          <el-input v-model="inStockFormData.storageLocation" placeholder="ÇëÊäÈë´æ·ÅÎ»ÖÃ" />
+        <el-form-item label="å­˜æ”¾ä½ç½®">
+          <el-input v-model="inStockFormData.storageLocation" placeholder="è¯·è¾“å…¥å­˜æ”¾ä½ç½®" />
         </el-form-item>
-        <el-form-item label="±¸×¢">
-          <el-input v-model="inStockFormData.remark" type="textarea" :rows="3" placeholder="ÇëÊäÈë±¸×¢" />
+        <el-form-item label="å¤‡æ³¨">
+          <el-input v-model="inStockFormData.remark" type="textarea" :rows="3" placeholder="è¯·è¾“å…¥å¤‡æ³¨" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="inStockDialogVisible = false">È¡Ïû</el-button>
-        <el-button type="primary" :loading="formLoading" @click="handleInStockSubmit">È·¶¨</el-button>
+        <el-button @click="inStockDialogVisible = false">å–æ¶ˆ</el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleInStockSubmit">ç¡®å®š</el-button>
       </template>
     </el-dialog>
 
     <el-dialog :title="operationTitle" v-model="operationDialogVisible" width="500px">
       <el-form ref="operationFormRef" :model="operationFormData" :rules="operationRules" label-width="100px">
-        <el-form-item label="Ò©Æ·">
+        <el-form-item label="è¯å“">
           <el-input :value="currentStock?.medicineName" disabled />
         </el-form-item>
-        <el-form-item label="Åú´ÎºÅ">
+        <el-form-item label="æ‰¹æ¬¡å·">
           <el-input :value="currentStock?.batchNo" disabled />
         </el-form-item>
-        <el-form-item label="µ±Ç°¿â´æ">
+        <el-form-item label="å½“å‰åº“å­˜">
           <el-input :value="`${currentStock?.quantity} ${currentStock?.unit}`" disabled />
         </el-form-item>
-        <el-form-item label="²Ù×÷ÊıÁ¿" prop="quantity">
+        <el-form-item label="æ“ä½œæ•°é‡" prop="quantity">
           <el-input-number
             v-model="operationFormData.quantity"
             :min="1"
@@ -120,13 +120,13 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="±¸×¢">
-          <el-input v-model="operationFormData.remark" type="textarea" :rows="3" placeholder="ÇëÊäÈë±¸×¢" />
+        <el-form-item label="å¤‡æ³¨">
+          <el-input v-model="operationFormData.remark" type="textarea" :rows="3" placeholder="è¯·è¾“å…¥å¤‡æ³¨" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="operationDialogVisible = false">È¡Ïû</el-button>
-        <el-button type="primary" :loading="formLoading" @click="handleOperationSubmit">È·¶¨</el-button>
+        <el-button @click="operationDialogVisible = false">å–æ¶ˆ</el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleOperationSubmit">ç¡®å®š</el-button>
       </template>
     </el-dialog>
   </div>
@@ -191,20 +191,20 @@ const operationFormData = reactive({
 })
 
 const inStockRules = {
-  medicineId: [{ required: true, message: 'ÇëÑ¡ÔñÒ©Æ·', trigger: 'change' }],
-  batchNo: [{ required: true, message: 'ÇëÊäÈëÅú´ÎºÅ', trigger: 'blur' }],
-  quantity: [{ required: true, message: 'ÇëÊäÈëÊıÁ¿', trigger: 'blur' }],
-  expireDate: [{ required: true, message: 'ÇëÑ¡Ôñ¹ıÆÚÈÕÆÚ', trigger: 'change' }]
+  medicineId: [{ required: true, message: 'è¯·é€‰æ‹©è¯å“', trigger: 'change' }],
+  batchNo: [{ required: true, message: 'è¯·è¾“å…¥æ‰¹æ¬¡å·', trigger: 'blur' }],
+  quantity: [{ required: true, message: 'è¯·è¾“å…¥æ•°é‡', trigger: 'blur' }],
+  expireDate: [{ required: true, message: 'è¯·é€‰æ‹©è¿‡æœŸæ—¥æœŸ', trigger: 'change' }]
 }
 
 const operationRules = {
-  quantity: [{ required: true, message: 'ÇëÊäÈëÊıÁ¿', trigger: 'blur' }]
+  quantity: [{ required: true, message: 'è¯·è¾“å…¥æ•°é‡', trigger: 'blur' }]
 }
 
 const operationTitle = computed(() => {
-  if (operationType.value === 'in') return 'Ò©Æ·Èë¿â'
-  if (operationType.value === 'out') return 'Ò©Æ·³ö¿â'
-  return '¿â´æµ÷Õû'
+  if (operationType.value === 'in') return 'è¯å“å…¥åº“'
+  if (operationType.value === 'out') return 'è¯å“å‡ºåº“'
+  return 'åº“å­˜è°ƒæ•´'
 })
 
 const getExpireTagType = (days: number) => {
@@ -215,11 +215,11 @@ const getExpireTagType = (days: number) => {
 }
 
 const getExpireText = (days: number) => {
-  if (days < 0) return `ÒÑ¹ıÆÚ${Math.abs(days)}Ìì`
-  if (days === 0) return '½ñÈÕ¹ıÆÚ'
-  if (days <= 7) return `${days}Ììºó¹ıÆÚ`
-  if (days <= 30) return `${days}Ììºó¹ıÆÚ`
-  return 'Õı³£'
+  if (days < 0) return `å·²è¿‡æœŸ${Math.abs(days)}å¤©`
+  if (days === 0) return 'ä»Šæ—¥è¿‡æœŸ'
+  if (days <= 7) return `${days}å¤©åè¿‡æœŸ`
+  if (days <= 30) return `${days}å¤©åè¿‡æœŸ`
+  return 'æ­£å¸¸'
 }
 
 const loadStockList = async () => {
@@ -237,7 +237,7 @@ const loadStockList = async () => {
       ElMessage.error(response.message)
     }
   } catch (error) {
-    ElMessage.error('»ñÈ¡¿â´æÁĞ±íÊ§°Ü')
+    ElMessage.error('è·å–åº“å­˜åˆ—è¡¨å¤±è´¥')
   } finally {
     loading.value = false
   }
@@ -250,7 +250,7 @@ const loadMedicineList = async () => {
       medicineList.value = response.data.records
     }
   } catch (error) {
-    console.error('»ñÈ¡Ò©Æ·ÁĞ±íÊ§°Ü', error)
+    console.error('è·å–è¯å“åˆ—è¡¨å¤±è´¥', error)
   }
 }
 
@@ -290,11 +290,11 @@ const handleOut = async (row: StockVO) => {
   if (row.expireDays < 0) {
     try {
       await ElMessageBox.confirm(
-        '¸ÃÒ©Æ·ÒÑ¹ıÆÚ£¬½¨ÒéÏú»Ù£¬ÇëÈ·ÈÏÊÇ·ñ¼ÌĞøÁìÈ¡£¿',
-        '¹ıÆÚÒ©Æ·¾¯¸æ',
+        'è¯¥è¯å“å·²è¿‡æœŸï¼Œå»ºè®®é”€æ¯ï¼Œè¯·ç¡®è®¤æ˜¯å¦ç»§ç»­é¢†å–ï¼Ÿ',
+        'è¿‡æœŸè¯å“è­¦å‘Š',
         {
-          confirmButtonText: 'È·ÈÏÁìÈ¡',
-          cancelButtonText: 'È¡Ïû',
+          confirmButtonText: 'ç¡®è®¤é¢†å–',
+          cancelButtonText: 'å–æ¶ˆ',
           type: 'error'
         }
       )
@@ -331,14 +331,14 @@ const handleInStockSubmit = async () => {
         expireDate: new Date(inStockFormData.expireDate).toISOString().split('T')[0]
       })
       if (response.code === 200) {
-        ElMessage.success('Èë¿â³É¹¦')
+        ElMessage.success('å…¥åº“æˆåŠŸ')
         inStockDialogVisible.value = false
         loadStockList()
       } else {
         ElMessage.error(response.message)
       }
     } catch (error) {
-      ElMessage.error('Èë¿âÊ§°Ü')
+      ElMessage.error('å…¥åº“å¤±è´¥')
     } finally {
       formLoading.value = false
     }
@@ -368,14 +368,14 @@ const handleOperationSubmit = async () => {
       }
 
       if (response && response.code === 200) {
-        ElMessage.success(operationType.value === 'out' ? '³ö¿â³É¹¦' : 'µ÷Õû³É¹¦')
+        ElMessage.success(operationType.value === 'out' ? 'å‡ºåº“æˆåŠŸ' : 'è°ƒæ•´æˆåŠŸ')
         operationDialogVisible.value = false
         loadStockList()
       } else if (response) {
         ElMessage.error(response.message)
       }
     } catch (error) {
-      ElMessage.error(operationType.value === 'out' ? '³ö¿âÊ§°Ü' : 'µ÷ÕûÊ§°Ü')
+      ElMessage.error(operationType.value === 'out' ? 'å‡ºåº“å¤±è´¥' : 'è°ƒæ•´å¤±è´¥')
     } finally {
       formLoading.value = false
     }

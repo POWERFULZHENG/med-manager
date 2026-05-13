@@ -32,8 +32,11 @@ public class MedicineStock {
     @TableField("storage_location")
     private String storageLocation;
 
-    @TableField("remark")
-    private String remark;
+    @TableField("warning_days")
+    private String warningDays;
+
+    @TableField("status")
+    private String Status;
 
     @TableField("created_at")
     private LocalDateTime createdAt;
